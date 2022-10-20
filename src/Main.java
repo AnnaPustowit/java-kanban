@@ -13,9 +13,13 @@ public class Main {
                 //manager.createNewTask( some task-object );
                 manager.addTestObjects();
             } else if (userInput == 2) {    // вывести список задач в консоль
-                manager.getTaskList();
+                manager.getTasksList();
+                manager.getEpicsList();
+                manager.getSubtasksList();
             } else if (userInput == 3) {    // удаление всех задач
                 manager.deleteAllTasks();
+                manager.deleteAllEpics();
+                manager.deleteAllSubtasks();
             } else if(userInput == 4){      // получение задачи по id
                 System.out.println("Введите индентификационный номер задачи: ");
                 int numberOfTask = scanner.nextInt();

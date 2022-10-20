@@ -1,12 +1,15 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.List;
 
 public class Manager {
 
     int idGenerator;
-    HashMap<Integer, Task> tasksMap;
-    HashMap<Integer, Epic> epicsMap;
-    HashMap<Integer, Subtask> subtasksMap;
+    Map<Integer, Task> tasksMap;
+    Map<Integer, Epic> epicsMap;
+    Map<Integer, Subtask> subtasksMap;
 
     public Manager() {
         idGenerator = 1;
@@ -15,56 +18,72 @@ public class Manager {
         subtasksMap = new HashMap<>();
     }
 
-    public void createNewTask(Object object) {
-        if (object.getClass() == new Task().getClass()) {
-            tasksMap.put(((Task) object).getId(), (Task) object);
-        } else if (object.getClass() == new Epic().getClass()) {
-            epicsMap.put(((Epic) object).getId(), (Epic) object);
-        } else if (object.getClass() == new Subtask().getClass()) {
-            int tempEpicId = ((Subtask) object).getEpicId();
-            int tempSubtaskId = ((Subtask) object).getId();
-            subtasksMap.put(tempSubtaskId, (Subtask) object);
+    public void createNewTask(Task task) {
+        if (task instanceof Epic) {
+            epicsMap.put(task.getId(), (Epic) task);
+        } else if (task instanceof Subtask) {
+            int tempEpicId = task.getEpicId();
+            int tempSubtaskId = task.getId();
+            subtasksMap.put(tempSubtaskId, (Subtask) task);
             epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
+        } else if (task instanceof Task) {
+            tasksMap.put(task.getId(), task);
         }
     }
 
-    public void getTaskList(){
-        if (tasksMap.isEmpty() && epicsMap.isEmpty() && subtasksMap.isEmpty()) {
-            System.out.println("Список задач пуст.");
-            return;
-        }
+    public List getTasksList() {
+        List<Task> tasksList = new ArrayList<>();
 
         for (Integer key : tasksMap.keySet()) {
             System.out.println("Задача номер: " + key + " . Название: " + tasksMap.get(key).getName());
             System.out.println("Описание: " + tasksMap.get(key).getDescription());
-            System.out.println("Статус задачи: " + tasksMap.get(key).getStatus() );
+            System.out.println("Статус задачи: " + tasksMap.get(key).getStatus());
+            tasksList.add(tasksMap.get(key));
         }
         System.out.println();
+        return tasksList;
+    }
+
+    public List getEpicsList() {
+        List<Epic> epicsList = new ArrayList<>();
 
         for (Integer key : epicsMap.keySet()) {
             System.out.println("Эпик номер: " + key + " . Название: " + epicsMap.get(key).getName());
             System.out.println("Описание: " + epicsMap.get(key).getDescription());
             System.out.println("Статус эпика: " + epicsMap.get(key).getStatus());
-
-            HashSet<Integer> subtaskTempSet = epicsMap.get(key).getSetOfSubtasks();
-            for (Integer subKey : subtaskTempSet) {
-                System.out.println("Сабтаск номер: " + subKey + " . Название: " + subtasksMap.get(subKey).getName());
-                System.out.println("Описание: " + subtasksMap.get(subKey).getDescription());
-                System.out.println("Статус сабтаска: " + subtasksMap.get(subKey).getStatus());
-            }
-            System.out.println();
+            epicsList.add(epicsMap.get(key));
         }
+        System.out.println();
+        return epicsList;
+    }
+
+    public List getSubtasksList() {
+        List<Subtask> subtasksList = new ArrayList<>();
+
+        for (Integer key : subtasksMap.keySet()) {
+                System.out.println("Сабтаск номер: " + key + " . Название: " + subtasksMap.get(key).getName());
+                System.out.println("Описание: " + subtasksMap.get(key).getDescription());
+                System.out.println("Статус сабтаска: " + subtasksMap.get(key).getStatus());
+                subtasksList.add(subtasksMap.get(key));
+        }
+        System.out.println();
+        return subtasksList;
     }
 
     public void deleteAllTasks() {
             tasksMap.clear();
-            epicsMap.clear();
-            subtasksMap.clear();
-            System.out.println("Список задач очищен.");
     }
 
-    public Object getTaskById(int number) {
-        Object tempTask;
+    public void deleteAllEpics() {
+        epicsMap.clear();
+    }
+
+    public void deleteAllSubtasks() {
+        subtasksMap.clear();
+    }
+
+    public Task getTaskById(int number) {
+        Task tempTask;
         if (tasksMap.containsKey(number)) {
             tempTask = tasksMap.get(number);
         } else if (epicsMap.containsKey(number)) {
@@ -96,24 +115,24 @@ public class Manager {
         }
     }
 
-    public void updateTasks(Object object) {
-        if (object.getClass() == new Task().getClass()) {
-            tasksMap.put(((Task) object).getId(), (Task) object);
-        } else if (object.getClass() == new Epic().getClass()) {
-            int tempEpicId = ((Epic) object). getId();
+    public void updateTasks(Task task) {
+         if (task instanceof Epic) {
+            int tempEpicId = task. getId();
 
             // удаляем все subtasks у старого epic
             HashSet<Integer>  subtasksTempSet  = epicsMap.get(tempEpicId).getSetOfSubtasks();
             for (Integer key : subtasksTempSet){
                 subtasksMap.remove(key);
             }
-            epicsMap.put(tempEpicId, (Epic) object);
-        } else if (object.getClass() == new Subtask().getClass()) {
-            int tempEpicId = ((Subtask) object).getEpicId();
-            int tempSubtaskId = ((Subtask) object).getId();
-            subtasksMap.put(tempSubtaskId, (Subtask) object);
+            epicsMap.put(tempEpicId, (Epic) task);
+        } else if (task instanceof  Subtask) {
+            int tempEpicId = task.getEpicId();
+            int tempSubtaskId = task.getId();
+            subtasksMap.put(tempSubtaskId, (Subtask) task);
             epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
-        }
+        } else if (task instanceof Task) {
+             tasksMap.put(task.getId(), task);
+         }
     }
 
     public int generateId(){
@@ -121,23 +140,23 @@ public class Manager {
     }
 
     public void addTestObjects() {
-        Task task1 = new Task(generateId(), "Съесть пирожок", "Пирожой с вишней", "NEW");
+        Task task1 = new Task(generateId(), "Съесть пирожок", "Пирожой с вишней", Task.Status.NEW);
 
         int testEpic1 = generateId();
         Epic epic1 = new Epic(testEpic1,"Съесть пиццы кусок", "Кусочек пиццы",
-                "DONE");
+                Task.Status.DONE);
         Subtask subtask1 = new Subtask(generateId(),"Выбрать пиццу в меню ресторана",
-                "Выбор пиццы в меню", "NEW", testEpic1);
+                "Выбор пиццы в меню", Task.Status.NEW, testEpic1);
         Subtask subtask2 = new Subtask(generateId(), "Заказать пиццу",
-                "Заказ пиццы", "DONE", testEpic1);
+                "Заказ пиццы", Task.Status.DONE, testEpic1);
 
         int testEpic2 = generateId();
-        Epic epic2 = new Epic(testEpic2,"Сходить в магазин", "Магазин у дома", "DONE");
+        Epic epic2 = new Epic(testEpic2,"Сходить в магазин", "Магазин у дома", Task.Status.DONE);
         Subtask subtask3 = new Subtask(generateId(), "Купить булочку", "Простую булочку",
-                "DONE", testEpic2);
+                Task.Status.DONE, testEpic2);
 
         Task task2 = new Task(generateId(), "Забрать заказ", "Заказ из магазина техники",
-                "DONE");
+                Task.Status.DONE);
 
         createNewTask(task1);
         createNewTask(epic1);
@@ -151,7 +170,7 @@ public class Manager {
         int testSubtask3 = 3;
         int testEpic2 = 2;
         Subtask subtask4 = new Subtask(testSubtask3, "Пойти погулять",
-                "Пешая прогулка","DONE",testEpic2);
+                "Пешая прогулка",Task.Status.DONE, testEpic2);
         updateTasks(subtask4);
     }
 }
