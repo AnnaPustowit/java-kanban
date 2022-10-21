@@ -44,7 +44,7 @@ public class Epic extends Task {
             }
         }
 
-        if (newCount !=0 && inProgressCount == 0 && doneCount == 0) {
+        if (newCount != 0 && inProgressCount == 0 && doneCount == 0) {
             this.status = Status.NEW;
         } else if(doneCount != 0 && newCount == 0 && inProgressCount == 0) {
             this.status = Status.DONE;

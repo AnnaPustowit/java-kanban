@@ -24,8 +24,12 @@ public class Manager {
         } else if (task instanceof Subtask) {
             int tempEpicId = task.getEpicId();
             int tempSubtaskId = task.getId();
-            subtasksMap.put(tempSubtaskId, (Subtask) task);
-            epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
+            if (epicsMap.containsKey(tempEpicId)) {
+                subtasksMap.put(tempSubtaskId, (Subtask) task);
+                epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
+            } else {
+                System.out.println("Для этой подзадачи не существует эпика. Добавление не выполнено.");
+            }
         } else if (task instanceof Task) {
             tasksMap.put(task.getId(), task);
         }
@@ -71,7 +75,7 @@ public class Manager {
     }
 
     public void deleteAllTasks() {
-            tasksMap.clear();
+        tasksMap.clear();
     }
 
     public void deleteAllEpics() {
@@ -101,7 +105,7 @@ public class Manager {
         if (tasksMap.containsKey(number)) {
             tasksMap.remove(number);
         } else if (epicsMap.containsKey(number)) {
-            HashSet<Integer>  subtasksTempSet  = epicsMap.get(number).getSetOfSubtasks();
+            HashSet<Integer> subtasksTempSet = epicsMap.get(number).getSetOfSubtasks();
             for (Integer subKey : subtasksTempSet) {
                 subtasksMap.remove(subKey);
             }
@@ -117,21 +121,32 @@ public class Manager {
 
     public void updateTasks(Task task) {
          if (task instanceof Epic) {
-            int tempEpicId = task. getId();
-
-            // удаляем все subtasks у старого epic
-            HashSet<Integer>  subtasksTempSet  = epicsMap.get(tempEpicId).getSetOfSubtasks();
-            for (Integer key : subtasksTempSet){
-                subtasksMap.remove(key);
+            int tempEpicId = task.getId();
+            if (epicsMap.containsKey(tempEpicId)) {
+                // удаляем все subtasks у старого epic
+                HashSet<Integer> subtasksTempSet = epicsMap.get(tempEpicId).getSetOfSubtasks();
+                for (Integer key : subtasksTempSet) {
+                    subtasksMap.remove(key);
+                }
+                epicsMap.put(tempEpicId, (Epic) task);
+            } else {
+                System.out.println("Эпика с таким номером не существует. Обновление не выполнено.");
             }
-            epicsMap.put(tempEpicId, (Epic) task);
         } else if (task instanceof  Subtask) {
             int tempEpicId = task.getEpicId();
             int tempSubtaskId = task.getId();
-            subtasksMap.put(tempSubtaskId, (Subtask) task);
-            epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
+            if (epicsMap.containsKey(tempEpicId) && subtasksMap.containsKey(tempSubtaskId)) {
+                subtasksMap.put(tempSubtaskId, (Subtask) task);
+                epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
+            } else {
+                System.out.println("Подзадачи или эпика с таким номером не существует. Обновление не выполнено.");
+            }
         } else if (task instanceof Task) {
-             tasksMap.put(task.getId(), task);
+             if (tasksMap.containsKey(task.getId())) {
+                 tasksMap.put(task.getId(), task);
+             } else {
+                 System.out.println("Задачи с таким номером не существует. Обновление не выполнено.");
+             }
          }
     }
 
