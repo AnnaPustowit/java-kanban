@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Manager manager = new Manager();
+        TaskManager manager = Managers.getDefault();
 
         while(true) {
             printMenu();
@@ -12,24 +12,30 @@ public class Main {
             if(userInput == 1){             // добавление задачи
                 //manager.createNewTask( some task-object );
                 manager.addTestObjects();
+                manager.getHistory();//
             } else if (userInput == 2) {    // вывести список задач в консоль
                 manager.getTasksList();
                 manager.getEpicsList();
                 manager.getSubtasksList();
+                manager.getHistory();
             } else if (userInput == 3) {    // удаление всех задач
                 manager.deleteAllTasks();
                 manager.deleteAllEpics();
                 manager.deleteAllSubtasks();
+                manager.getHistory();
             } else if(userInput == 4){      // получение задачи по id
                 System.out.println("Введите индентификационный номер задачи: ");
                 int numberOfTask = scanner.nextInt();
                 manager.getTaskById(numberOfTask);
+                manager.getHistory();
             } else if(userInput == 5){      // удаление задачи по id
                 System.out.println("Введите индентификационный номер задачи: ");
                 int numberOfTask = scanner.nextInt();
                 manager.deleteTaskById(numberOfTask);
+                manager.getHistory();
             } else if (userInput == 6) {    // обновление (замещение) задачи
                 manager.updatedTestObjects();
+                manager.getHistory();
             }else if (userInput == 0) {
                 System.out.println("Программа завершена.");
                 break;

@@ -1,23 +1,26 @@
+import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.List;
 
-public class Manager {
-
+public class InMemoryTaskManager implements TaskManager {
     int idGenerator;
     Map<Integer, Task> tasksMap;
     Map<Integer, Epic> epicsMap;
     Map<Integer, Subtask> subtasksMap;
+    HistoryManager historyManager;
 
-    public Manager() {
+    public InMemoryTaskManager() {
         idGenerator = 1;
         tasksMap = new HashMap<>();
         epicsMap = new HashMap<>();
         subtasksMap = new HashMap<>();
+        historyManager = Managers.getDefaultHistory();
     }
 
+    @Override
     public void createNewTask(Task task) {
         if (task instanceof Epic) {
             epicsMap.put(task.getId(), (Epic) task);
@@ -35,6 +38,7 @@ public class Manager {
         }
     }
 
+    @Override
     public List getTasksList() {
         List<Task> tasksList = new ArrayList<>();
 
@@ -48,6 +52,7 @@ public class Manager {
         return tasksList;
     }
 
+    @Override
     public List getEpicsList() {
         List<Epic> epicsList = new ArrayList<>();
 
@@ -61,31 +66,36 @@ public class Manager {
         return epicsList;
     }
 
+    @Override
     public List getSubtasksList() {
         List<Subtask> subtasksList = new ArrayList<>();
 
         for (Integer key : subtasksMap.keySet()) {
-                System.out.println("Сабтаск номер: " + key + " . Название: " + subtasksMap.get(key).getName());
-                System.out.println("Описание: " + subtasksMap.get(key).getDescription());
-                System.out.println("Статус сабтаска: " + subtasksMap.get(key).getStatus());
-                subtasksList.add(subtasksMap.get(key));
+            System.out.println("Сабтаск номер: " + key + " . Название: " + subtasksMap.get(key).getName());
+            System.out.println("Описание: " + subtasksMap.get(key).getDescription());
+            System.out.println("Статус сабтаска: " + subtasksMap.get(key).getStatus());
+            subtasksList.add(subtasksMap.get(key));
         }
         System.out.println();
         return subtasksList;
     }
 
+    @Override
     public void deleteAllTasks() {
         tasksMap.clear();
     }
 
+    @Override
     public void deleteAllEpics() {
         epicsMap.clear();
     }
 
+    @Override
     public void deleteAllSubtasks() {
         subtasksMap.clear();
     }
 
+    @Override
     public Task getTaskById(int number) {
         Task tempTask;
         if (tasksMap.containsKey(number)) {
@@ -98,9 +108,11 @@ public class Manager {
             System.out.println("Задача под таким номером еще не создана.");
             tempTask = new Task();
         }
+        historyManager.add(tempTask);
         return tempTask;
     }
 
+    @Override
     public void deleteTaskById(int number) {
         if (tasksMap.containsKey(number)) {
             tasksMap.remove(number);
@@ -119,8 +131,9 @@ public class Manager {
         }
     }
 
+    @Override
     public void updateTasks(Task task) {
-         if (task instanceof Epic) {
+        if (task instanceof Epic) {
             int tempEpicId = task.getId();
             if (epicsMap.containsKey(tempEpicId)) {
                 // удаляем все subtasks у старого epic
@@ -142,18 +155,25 @@ public class Manager {
                 System.out.println("Подзадачи или эпика с таким номером не существует. Обновление не выполнено.");
             }
         } else if (task instanceof Task) {
-             if (tasksMap.containsKey(task.getId())) {
-                 tasksMap.put(task.getId(), task);
-             } else {
-                 System.out.println("Задачи с таким номером не существует. Обновление не выполнено.");
-             }
-         }
+            if (tasksMap.containsKey(task.getId())) {
+                tasksMap.put(task.getId(), task);
+            } else {
+                System.out.println("Задачи с таким номером не существует. Обновление не выполнено.");
+            }
+        }
     }
 
+    @Override
     public int generateId(){
         return idGenerator++;
     }
 
+    @Override
+    public List<Task> getHistory(){
+        return historyManager.getHistory();
+    }
+
+    @Override
     public void addTestObjects() {
         Task task1 = new Task(generateId(), "Съесть пирожок", "Пирожой с вишней", Task.Status.NEW);
 
@@ -181,6 +201,8 @@ public class Manager {
         createNewTask(subtask3);
         createNewTask(task2);
     }
+
+    @Override
     public void updatedTestObjects() {
         int testSubtask3 = 3;
         int testEpic2 = 2;
