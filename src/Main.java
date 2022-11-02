@@ -11,32 +11,28 @@ public class Main {
             int userInput = scanner.nextInt();
             if(userInput == 1){             // добавление задачи
                 //manager.createNewTask( some task-object );
-                manager.addTestObjects();
-                manager.getHistory();//
             } else if (userInput == 2) {    // вывести список задач в консоль
                 manager.getTasksList();
                 manager.getEpicsList();
                 manager.getSubtasksList();
-                manager.getHistory();
             } else if (userInput == 3) {    // удаление всех задач
                 manager.deleteAllTasks();
                 manager.deleteAllEpics();
                 manager.deleteAllSubtasks();
-                manager.getHistory();
             } else if(userInput == 4){      // получение задачи по id
                 System.out.println("Введите индентификационный номер задачи: ");
                 int numberOfTask = scanner.nextInt();
                 manager.getTaskById(numberOfTask);
-                manager.getHistory();
             } else if(userInput == 5){      // удаление задачи по id
                 System.out.println("Введите индентификационный номер задачи: ");
                 int numberOfTask = scanner.nextInt();
                 manager.deleteTaskById(numberOfTask);
-                manager.getHistory();
             } else if (userInput == 6) {    // обновление (замещение) задачи
-                manager.updatedTestObjects();
-                manager.getHistory();
-            }else if (userInput == 0) {
+                //manager.updateTasks( some task-object );
+            /* } else if (userInput == 9) {    // тестирование
+                TestClass test = new TestClass();
+                test.runTest(); */
+            } else if (userInput == 0) {
                 System.out.println("Программа завершена.");
                 break;
             } else{

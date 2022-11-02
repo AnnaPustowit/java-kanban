@@ -25,4 +25,14 @@ public class InMemoryHistoryManager implements HistoryManager {
         historyList.add(task);
     }
 
+    @Override
+    public void update(Task newTask){
+        for (int i = 0; i < historyList.size(); i++) {
+            if (historyList.get(i).getId() == newTask.getId()) {
+                historyList.remove(i);
+                historyList.add(i, newTask);
+            }
+        }
+    }
+
 }

@@ -25,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (task instanceof Epic) {
             epicsMap.put(task.getId(), (Epic) task);
         } else if (task instanceof Subtask) {
-            int tempEpicId = task.getEpicId();
+            int tempEpicId = ((Subtask)task).getEpicId();
             int tempSubtaskId = task.getId();
             if (epicsMap.containsKey(tempEpicId)) {
                 subtasksMap.put(tempSubtaskId, (Subtask) task);
@@ -146,7 +146,7 @@ public class InMemoryTaskManager implements TaskManager {
                 System.out.println("Эпика с таким номером не существует. Обновление не выполнено.");
             }
         } else if (task instanceof  Subtask) {
-            int tempEpicId = task.getEpicId();
+            int tempEpicId = ((Subtask)task).getEpicId();
             int tempSubtaskId = task.getId();
             if (epicsMap.containsKey(tempEpicId) && subtasksMap.containsKey(tempSubtaskId)) {
                 subtasksMap.put(tempSubtaskId, (Subtask) task);
@@ -161,6 +161,8 @@ public class InMemoryTaskManager implements TaskManager {
                 System.out.println("Задачи с таким номером не существует. Обновление не выполнено.");
             }
         }
+        historyManager.update(task);
+
     }
 
     @Override
@@ -173,41 +175,5 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    @Override
-    public void addTestObjects() {
-        Task task1 = new Task(generateId(), "Съесть пирожок", "Пирожой с вишней", Task.Status.NEW);
 
-        int testEpic1 = generateId();
-        Epic epic1 = new Epic(testEpic1,"Съесть пиццы кусок", "Кусочек пиццы",
-                Task.Status.DONE);
-        Subtask subtask1 = new Subtask(generateId(),"Выбрать пиццу в меню ресторана",
-                "Выбор пиццы в меню", Task.Status.NEW, testEpic1);
-        Subtask subtask2 = new Subtask(generateId(), "Заказать пиццу",
-                "Заказ пиццы", Task.Status.DONE, testEpic1);
-
-        int testEpic2 = generateId();
-        Epic epic2 = new Epic(testEpic2,"Сходить в магазин", "Магазин у дома", Task.Status.DONE);
-        Subtask subtask3 = new Subtask(generateId(), "Купить булочку", "Простую булочку",
-                Task.Status.DONE, testEpic2);
-
-        Task task2 = new Task(generateId(), "Забрать заказ", "Заказ из магазина техники",
-                Task.Status.DONE);
-
-        createNewTask(task1);
-        createNewTask(epic1);
-        createNewTask(subtask1);
-        createNewTask(subtask2);
-        createNewTask(epic2);
-        createNewTask(subtask3);
-        createNewTask(task2);
-    }
-
-    @Override
-    public void updatedTestObjects() {
-        int testSubtask3 = 3;
-        int testEpic2 = 2;
-        Subtask subtask4 = new Subtask(testSubtask3, "Пойти погулять",
-                "Пешая прогулка",Task.Status.DONE, testEpic2);
-        updateTasks(subtask4);
-    }
 }

@@ -40,7 +40,7 @@ public class Task {
         return status;
     }
 
-    public int getEpicId() {
-        return 0;
-    }
+    //public int getEpicId() {
+        //return 0;
+    //}
 }

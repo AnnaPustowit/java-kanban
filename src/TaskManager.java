@@ -25,8 +25,4 @@ public interface TaskManager {
     public int generateId();
 
     public List<Task> getHistory();
-
-    public void addTestObjects();
-
-    public void updatedTestObjects();
 }
