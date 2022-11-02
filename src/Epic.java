@@ -24,6 +24,11 @@ public class Epic extends Task {
         checkCurrentStatus(subtask);
     }
 
+    public void clearSubtasksList() {
+        subtasksId.clear();
+        status = Status.DONE;
+    }
+
     public HashSet getSetOfSubtasks() {
         return subtasksId;
     }

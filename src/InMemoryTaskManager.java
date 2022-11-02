@@ -88,11 +88,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         epicsMap.clear();
+        subtasksMap.clear();
     }
 
     @Override
     public void deleteAllSubtasks() {
         subtasksMap.clear();
+        for (int i = 0; i < epicsMap.size(); i++) {
+            epicsMap.get(i).clearSubtasksList();
+        }
     }
 
     @Override
