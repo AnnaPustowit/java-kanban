@@ -1,3 +1,8 @@
+package kanban;
+
+import kanban.managers.Managers;
+import kanban.managers.TaskManager;
+
 import java.util.Scanner;
 
 public class Main {
@@ -10,7 +15,7 @@ public class Main {
             printMenu();
             int userInput = scanner.nextInt();
             if(userInput == 1){             // добавление задачи
-                //manager.createNewTask( some task-object );
+                //manager.createNewTask( some kanban.task-object );
             } else if (userInput == 2) {    // вывести список задач в консоль
                 manager.getTasksList();
                 manager.getEpicsList();
@@ -28,10 +33,10 @@ public class Main {
                 int numberOfTask = scanner.nextInt();
                 manager.deleteTaskById(numberOfTask);
             } else if (userInput == 6) {    // обновление (замещение) задачи
-                //manager.updateTasks( some task-object );
-            /* } else if (userInput == 9) {    // тестирование
-                TestClass test = new TestClass();
-                test.runTest(); */
+                //manager.updateTasks( some kanban.task-object );
+             } else if (userInput == 9) {    // тестирование
+                kanban.TestClass test = new kanban.TestClass();
+                test.runTest();
             } else if (userInput == 0) {
                 System.out.println("Программа завершена.");
                 break;

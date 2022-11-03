@@ -1,3 +1,7 @@
+package kanban.managers;
+
+//import kanban.managers.HistoryManager;
+import kanban.task.Task;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,8 +15,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        for (Task t : historyList) {
-            System.out.println(t.nameTask);
+        for (Task task : historyList) {
+            System.out.println(task.getName());
         }
         return historyList;
     }

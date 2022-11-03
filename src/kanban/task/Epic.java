@@ -1,3 +1,5 @@
+package kanban.task;
+
 import java.util.Map;
 import java.util.HashSet;
 
@@ -5,7 +7,7 @@ public class Epic extends Task {
 
     private HashSet<Integer> subtasksId;
 
-    public Epic(int taskId, String nameTask, String description, Status status) {
+    public Epic(int taskId, String nameTask, String description, Task.Status status) {
         super(taskId, nameTask, description, status);
         subtasksId = new HashSet<>();
     }
@@ -26,7 +28,7 @@ public class Epic extends Task {
 
     public void clearSubtasksList() {
         subtasksId.clear();
-        status = Status.DONE;
+        status = Task.Status.DONE;
     }
 
     public HashSet getSetOfSubtasks() {
@@ -39,22 +41,22 @@ public class Epic extends Task {
         int doneCount = 0;
 
         for (Integer key : subtasksId) {
-            Status status = subtask.get(key).getStatus();
-            if (status.equals(Status.NEW)) {
+            Task.Status status = subtask.get(key).getStatus();
+            if (status.equals(Task.Status.NEW)) {
                 newCount++;
-            } else if (status.equals(Status.IN_PROGRESS)) {
+            } else if (status.equals(Task.Status.IN_PROGRESS)) {
                 inProgressCount++;
-            } else if (status.equals(Status.DONE)) {
+            } else if (status.equals(Task.Status.DONE)) {
                 doneCount++;
             }
         }
 
         if (newCount != 0 && inProgressCount == 0 && doneCount == 0) {
-            this.status = Status.NEW;
+            this.status = Task.Status.NEW;
         } else if(doneCount != 0 && newCount == 0 && inProgressCount == 0) {
-            this.status = Status.DONE;
+            this.status = Task.Status.DONE;
         } else {
-            this.status = Status.IN_PROGRESS;
+            this.status = Task.Status.IN_PROGRESS;
         }
     }
 }

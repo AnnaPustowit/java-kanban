@@ -1,3 +1,7 @@
+package kanban.managers;
+
+import kanban.task.Task;
+
 import java.util.List;
 
 public interface TaskManager {

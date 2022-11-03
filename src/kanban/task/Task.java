@@ -1,3 +1,5 @@
+package kanban.task;
+
 public class Task {
     protected int taskId;
     protected String nameTask;

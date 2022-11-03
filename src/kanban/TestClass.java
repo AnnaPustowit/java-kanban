@@ -1,3 +1,11 @@
+package kanban;
+
+import kanban.managers.Managers;
+import kanban.managers.TaskManager;
+import kanban.task.Epic;
+import kanban.task.Subtask;
+import kanban.task.Task;
+
 public class TestClass {
 
     TaskManager testManager = Managers.getDefault();

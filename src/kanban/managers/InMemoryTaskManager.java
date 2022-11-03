@@ -1,8 +1,13 @@
+package kanban.managers;
+
+import kanban.task.Epic;
+import kanban.task.Subtask;
+import kanban.task.Task;
+
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.HashSet;
 
 public class InMemoryTaskManager implements TaskManager {
