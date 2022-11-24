@@ -1,42 +1,56 @@
 package kanban.managers;
 
-//import kanban.managers.HistoryManager;
 import kanban.task.Task;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final static int SIZE_OF_HISTORY_LIST = 10;
-    List<Task> historyList;
+    Map<Integer, TaskNode> historyMap;
+    MyLinkedList historyList;
 
-    public InMemoryHistoryManager(){
-        historyList = new LinkedList<>();
+    public InMemoryHistoryManager() {
+        historyMap = new HashMap<>();
+        historyList = new MyLinkedList();
     }
 
     @Override
-    public List<Task> getHistory() {
-        for (Task task : historyList) {
+    public ArrayList<Task> getHistory() {
+        ArrayList<Task> t = historyList.getTasks();
+        for (Task task : t) {
             System.out.println(task.getName());
         }
-        return historyList;
+        return t;
     }
 
     @Override
     public void add(Task task) {
-        if (historyList.size() == SIZE_OF_HISTORY_LIST) {
-            historyList.remove(0);
+        if (historyMap.containsKey(task.getId())) {
+            remove(task.getId());
         }
-        historyList.add(task);
+        TaskNode taskNode = new TaskNode(task);
+        historyList.linkLast(taskNode);
+        historyMap.put(task.getId(), taskNode);
+    }
+
+    @Override
+    public void remove(int id) {
+        historyList.removeNode(historyMap.get(id));
+        historyMap.remove(historyMap.get(id));
     }
 
     @Override
     public void update(Task newTask){
-        for (int i = 0; i < historyList.size(); i++) {
-            if (historyList.get(i).getId() == newTask.getId()) {
-                historyList.remove(i);
-                historyList.add(i, newTask);
+        for (Map.Entry<Integer, TaskNode> entry : historyMap.entrySet()) {
+            if (entry.getKey() == newTask.getId()) {
+                TaskNode taskNode = new TaskNode(newTask);
+                historyMap.put(entry.getKey(), taskNode);
             }
         }
     }
+
+
 
 }
