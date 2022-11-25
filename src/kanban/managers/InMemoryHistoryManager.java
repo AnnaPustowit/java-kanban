@@ -18,11 +18,11 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public ArrayList<Task> getHistory() {
-        ArrayList<Task> t = historyList.getTasks();
-        for (Task task : t) {
+        ArrayList<Task> tasks = historyList.getTasks();
+        for (Task task : tasks) {
             System.out.println(task.getName());
         }
-        return t;
+        return tasks;
     }
 
     @Override
@@ -42,12 +42,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void update(Task newTask){
-        for (Map.Entry<Integer, TaskNode> entry : historyMap.entrySet()) {
-            if (entry.getKey() == newTask.getId()) {
-                TaskNode taskNode = new TaskNode(newTask);
-                historyMap.put(entry.getKey(), taskNode);
-            }
+    public void update(Task newTask) {
+        if(historyMap.containsKey(newTask.getId())) {
+            historyMap.get(newTask.getId()).setTask(newTask);
         }
     }
 

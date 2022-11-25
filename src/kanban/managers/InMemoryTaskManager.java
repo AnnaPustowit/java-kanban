@@ -159,7 +159,7 @@ public class InMemoryTaskManager implements TaskManager {
             int tempSubtaskId = task.getId();
             if (epicsMap.containsKey(tempEpicId) && subtasksMap.containsKey(tempSubtaskId)) {
                 subtasksMap.put(tempSubtaskId, (Subtask) task);
-                epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
+                epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);//обновление в классе Epic (теперь работает)
             } else {
                 System.out.println("Подзадачи или эпика с таким номером не существует. Обновление не выполнено.");
             }

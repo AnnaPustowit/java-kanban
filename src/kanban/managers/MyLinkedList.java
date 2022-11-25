@@ -8,6 +8,7 @@ import java.util.Iterator;
 class MyLinkedList {
 
     private TaskNode head;
+    private TaskNode tail;
     private  int size;
 
 
@@ -25,37 +26,45 @@ class MyLinkedList {
             head = node;
         }
         else if (size == 1) {
-            head.connectLeft(node);
             head.connectRight(node);
             node.connectLeft(head);
-            node.connectRight(head);
+            tail = node;
         } else {
-            TaskNode temp = head.getPrevElement();
-            temp.connectRight(node);
-            node.connectLeft(temp);
-            node.connectRight(head);
+            tail.connectRight(node);
+            node.connectLeft(tail);
+            tail = node;
         }
         size++;
     }
 
     public void removeNode(TaskNode node) {
-        if (node.getPrevElement() != null && node.getNextElement() != null && size > 2) {
+        if (size > 2) {
             if (head.equals(node)) {
                 head = head.getNextElement();
+                head.cutLeft();
+            } else if (tail.equals(node)){
+                tail = tail.getPrevElement();
+                tail.cutRight();
+            } else {
+
+                TaskNode left = node.getPrevElement();
+                TaskNode right = node.getNextElement();
+
+                left.connectRight(right);
+                right.connectLeft(left);
+
             }
 
-            TaskNode left = node.getPrevElement();
-            TaskNode right = node.getNextElement();
 
-            left.connectRight(right);
-            right.connectLeft(left);
         } else if (size == 2) {
             if (head.equals(node)) {
-                head = head.getNextElement();
+                head = tail;
+                tail = null;
+                head.cutLeft();
+            } else if (tail.equals(node)){
+                head.cutRight();
+                tail = null;
             }
-            TaskNode right = node.getNextElement();
-            right.cutLeft();
-            right.cutRight();
         } else {
             head = null;
         }
@@ -64,18 +73,12 @@ class MyLinkedList {
 
     public ArrayList<Task> getTasks() {
         ArrayList<Task> array = new ArrayList<>();
-        if (head != null) {
-            array.add(head.getTask());
-            if (size > 1) {
-                TaskNode node = head.getNextElement();
-                while (node != head) {
-                    array.add(node.getTask());
-                    node = node.getNextElement();
-                }
-            }
+        TaskNode node = head;
+        while (node != null) {
+            array.add(node.getTask());
+            node = node.getNextElement();
         }
         return array;
     }
-
 
 }

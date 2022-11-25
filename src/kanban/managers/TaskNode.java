@@ -52,4 +52,5 @@ public class TaskNode {
     public void setNextElement(TaskNode nextElement) {
         this.nextElement = nextElement;
     }
+
 }

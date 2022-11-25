@@ -32,7 +32,7 @@ public class TestClass {
         testManager.getHistory();
         updatedTestObjects();
         System.out.println();
-        //testManager.deleteTaskById(2);
+        testManager.deleteTaskById(2);
         testManager.deleteTaskById(3);
         System.out.println("ПОСЛЕ");
         testManager.getHistory();
