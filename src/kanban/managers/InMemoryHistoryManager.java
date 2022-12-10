@@ -47,7 +47,4 @@ public class InMemoryHistoryManager implements HistoryManager {
             historyMap.get(newTask.getId()).setTask(newTask);
         }
     }
-
-
-
 }

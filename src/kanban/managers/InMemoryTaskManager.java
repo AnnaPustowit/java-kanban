@@ -15,7 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
     Map<Integer, Task> tasksMap;
     Map<Integer, Epic> epicsMap;
     Map<Integer, Subtask> subtasksMap;
-    HistoryManager historyManager;
+    static HistoryManager historyManager;
 
     public InMemoryTaskManager() {
         idGenerator = 1;
@@ -159,7 +159,7 @@ public class InMemoryTaskManager implements TaskManager {
             int tempSubtaskId = task.getId();
             if (epicsMap.containsKey(tempEpicId) && subtasksMap.containsKey(tempSubtaskId)) {
                 subtasksMap.put(tempSubtaskId, (Subtask) task);
-                epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);//обновление в классе Epic (теперь работает)
+                epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
             } else {
                 System.out.println("Подзадачи или эпика с таким номером не существует. Обновление не выполнено.");
             }
@@ -183,6 +183,4 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory(){
         return (List<Task>) historyManager.getHistory();
     }
-
-
 }

@@ -54,8 +54,6 @@ class MyLinkedList {
                 right.connectLeft(left);
 
             }
-
-
         } else if (size == 2) {
             if (head.equals(node)) {
                 head = tail;

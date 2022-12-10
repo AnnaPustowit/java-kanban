@@ -12,16 +12,16 @@ public class TestClass {
 
     public void runTest(){
         addTestObjects();
-        testManager.getHistory();
-        testManager.getTasksList();
-        testManager.getEpicsList();
-        testManager.getSubtasksList();
-        testManager.getHistory();
+        //testManager.getHistory();
+        //testManager.getTasksList();
+        //testManager.getEpicsList();
+        //testManager.getSubtasksList();
+        //testManager.getHistory();
         System.out.println();
-        testManager.getHistory();
-        testManager.getTasksList();
-        testManager.getEpicsList();
-        testManager.getSubtasksList();
+        //testManager.getHistory();
+       // testManager.getTasksList();
+        //testManager.getEpicsList();
+        //testManager.getSubtasksList();
         System.out.println();
         testManager.getTaskById(1);
         testManager.getTaskById(2);
@@ -30,7 +30,7 @@ public class TestClass {
         testManager.getTaskById(5);
         System.out.println("ДО");
         testManager.getHistory();
-        updatedTestObjects();
+        //updatedTestObjects();
         System.out.println();
         testManager.deleteTaskById(2);
         testManager.deleteTaskById(3);
@@ -38,36 +38,36 @@ public class TestClass {
         testManager.getHistory();
         System.out.println();
         updatedTestObjects();
-        testManager.getTasksList();
-        testManager.getEpicsList();
-        testManager.getSubtasksList();
-        testManager.getHistory();
+        //testManager.getTasksList();
+        //testManager.getEpicsList();
+        // testManager.getSubtasksList();
+        //testManager.getHistory();
         System.out.println();
-        testManager.deleteAllTasks();
-        testManager.deleteAllEpics();
-        testManager.deleteAllSubtasks();
+        //testManager.deleteAllTasks();
+        //testManager.deleteAllEpics();
+        //testManager.deleteAllSubtasks();
         testManager.getHistory();
     }
 
 
     public void addTestObjects() {
 
-        Task task1 = new Task(testManager.generateId(), "Съесть пирожок", "Пирожой с вишней", Task.Status.NEW);
+        Task task1 = new Task(testManager.generateId(), Task.Type.TASK,"Съесть пирожок", "Пирожой с вишней", Task.Status.NEW);
 
         int testEpic1 = testManager.generateId();
-        Epic epic1 = new Epic(testEpic1,"Съесть пиццы кусок", "Кусочек пиццы",
+        Epic epic1 = new Epic(testEpic1, Task.Type.EPIC,"Съесть пиццы кусок", "Кусочек пиццы",
                 Task.Status.DONE);
-        Subtask subtask1 = new Subtask(testManager.generateId(),"Выбрать пиццу в меню ресторана",
+        Subtask subtask1 = new Subtask(testManager.generateId(), Task.Type.SUBTASK,"Выбрать пиццу в меню ресторана",
                 "Выбор пиццы в меню", Task.Status.NEW, testEpic1);
-        Subtask subtask2 = new Subtask(testManager.generateId(), "Заказать пиццу",
+        Subtask subtask2 = new Subtask(testManager.generateId(), Task.Type.SUBTASK, "Заказать пиццу",
                 "Заказ пиццы", Task.Status.DONE, testEpic1);
 
         int testEpic2 = testManager.generateId();
-        Epic epic2 = new Epic(testEpic2,"Сходить в магазин", "Магазин у дома", Task.Status.DONE);
-        Subtask subtask3 = new Subtask(testManager.generateId(), "Купить булочку", "Простую булочку",
+        Epic epic2 = new Epic(testEpic2, Task.Type.EPIC,"Сходить в магазин", "Магазин у дома", Task.Status.DONE);
+        Subtask subtask3 = new Subtask(testManager.generateId(), Task.Type.SUBTASK,"Купить булочку", "Простую булочку",
                 Task.Status.DONE, testEpic2);
 
-        Task task2 = new Task(testManager.generateId(), "Забрать заказ", "Заказ из магазина техники",
+        Task task2 = new Task(testManager.generateId(), Task.Type.TASK,"Забрать заказ", "Заказ из магазина техники",
                 Task.Status.DONE);
 
         testManager.createNewTask(task1);
@@ -83,7 +83,7 @@ public class TestClass {
 
         int testSubtask3 = 3;
         int testEpic2 = 2;
-        Subtask subtask4 = new Subtask(testSubtask3, "Пойти погулять",
+        Subtask subtask4 = new Subtask(testSubtask3, Task.Type.SUBTASK,"Пойти погулять",
                 "Пешая прогулка",Task.Status.DONE, testEpic2);
         testManager.updateTasks(subtask4);
     }
