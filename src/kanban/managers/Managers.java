@@ -1,8 +1,5 @@
 package kanban.managers;
 
-
-import java.io.IOException;
-
 public class Managers {
     public static TaskManager getDefault() {
         return FileBackedTasksManager.isHistoryFileExist()

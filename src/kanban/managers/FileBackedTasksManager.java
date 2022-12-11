@@ -23,7 +23,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         super();
     }
 
-    public void save() throws ManagerSaveException {
+    private void save() throws ManagerSaveException {
         clearFile();
         try (FileWriter fw = new FileWriter(tasksFile, true)) {
             ArrayList<Task> taskArray = (ArrayList<Task>) historyManager.getHistory();
@@ -42,30 +42,36 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    static FileBackedTasksManager loadFromFile() {
+    public static FileBackedTasksManager loadFromFile() {
         FileBackedTasksManager fileBacked = new FileBackedTasksManager();
         try (BufferedReader br = new BufferedReader(new FileReader(tasksFile))) {
-            if(br.ready()) {
-                br.readLine();
-            } else{
+            if(!br.ready()) {
                 throw new EOFException("Файл истории задач пуст.");
             }
+            String line = br.readLine();
+            if (!line.equals(fileBacked.FILE_LINE)) {
+                throw new IOException("Файл поврежден.");
+            }
+            boolean isTasksExist = false;
             while (br.ready()) {
-                String line = br.readLine();
+                line = br.readLine();
                 if (line.isEmpty()) {
                     break;
                 }
                 Task rebuiltTask = fromString(line);
                 if(rebuiltTask instanceof Epic) {
-                    fileBacked.epicsMap.put(rebuiltTask.getId(), (Epic) rebuiltTask);//  test
+                    fileBacked.epicsMap.put(rebuiltTask.getId(), (Epic) rebuiltTask);
                 } else if (rebuiltTask instanceof Subtask) {
                     fileBacked.subtasksMap.put(rebuiltTask.getId(), (Subtask) rebuiltTask);
                 } else {
                     fileBacked.tasksMap.put(rebuiltTask.getId(), rebuiltTask);
                 }
+                isTasksExist = true;
             }
-            List<Integer> rebuiltHistory = historyFromString(br.readLine());
-            fileBacked.restoreHistory(rebuiltHistory);
+            if (isTasksExist) {
+                List<Integer> rebuiltHistory = historyFromString(br.readLine());
+                fileBacked.restoreHistory(rebuiltHistory);
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (EOFException e) {
@@ -76,7 +82,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return fileBacked;
     }
 
-    public static Task fromString(String value) {
+    private static Task fromString(String value) {
         String[] array = value.split(",");
         int id = Integer.parseInt(array[0]);
         String types = array[1];
@@ -101,17 +107,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    static String historyToString(ArrayList<Task> taskArray) {
+    private static String historyToString(ArrayList<Task> taskArray) {
         String history = "";
         for (int i = 0; i < taskArray.size() - 1; i++) {
             history += taskArray.get(i).getId() + ",";
         }
-        if (taskArray.size() > 0)
+        if (!taskArray.isEmpty())
             history += taskArray.get(taskArray.size() - 1).getId();
         return history;
     }
 
-    static List<Integer> historyFromString(String value) {
+    private static List<Integer> historyFromString(String value) {
         String[] historyString = value.split(",");
         List<Integer> historyInt = new LinkedList<>();
         for (int i = 0; i < historyString.length; i++) {
@@ -120,7 +126,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return historyInt;
     }
 
-    public void clearFile() {
+    private void clearFile() {
         try (FileWriter fw = new FileWriter(tasksFile)) {
             fw.write("");
         } catch (FileNotFoundException e) {
@@ -130,13 +136,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    public void restoreHistory(List<Integer> idList) {
+    private void restoreHistory(List<Integer> idList) {
         for (Integer id : idList) {
             historyManager.add(getTaskById(id));
         }
     }
 
-    static boolean isHistoryFileExist() {
+    public static boolean isHistoryFileExist() {
         return tasksFile.isFile();
     }
 
@@ -144,22 +150,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public void createNewTask(Task task) {
         super.createNewTask(task);
         save();
-    }
-
-    @Override
-    public List getTasksList() {
-        return super.getTasksList();
-    }
-
-    @Override
-    public List getEpicsList() {
-        return super.getEpicsList();
-    }
-
-    @Override
-    public List getSubtasksList() {
-        return super.getSubtasksList();
-
     }
 
     @Override
@@ -181,11 +171,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task getTaskById(int number) {
-        return super.getTaskById(number);
-    }
-
-    @Override
     public void deleteTaskById(int number) {
         super.deleteTaskById(number);
         save();
@@ -195,15 +180,5 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public void updateTasks(Task task) {
         super.updateTasks(task);
         save();
-    }
-
-    @Override
-    public int generateId() {
-        return super.generateId();
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        return super.getHistory();
     }
 }
