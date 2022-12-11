@@ -16,8 +16,8 @@ import static kanban.task.Task.Status;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    final String  FILE_LINE = "id,type,name,status,description,epic";
-    static File tasksFile = new File("tasksFile.txt");
+    private final String  FILE_LINE = "id,type,name,status,description,epic";
+    private static File tasksFile = new File("tasksFile.txt");
 
     public FileBackedTasksManager() {
         super();

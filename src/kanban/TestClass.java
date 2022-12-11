@@ -43,9 +43,9 @@ public class TestClass {
         // testManager.getSubtasksList();
         //testManager.getHistory();
         System.out.println();
-        //testManager.deleteAllTasks();
-        //testManager.deleteAllEpics();
-        //testManager.deleteAllSubtasks();
+        testManager.deleteAllTasks();
+        testManager.deleteAllEpics();
+        testManager.deleteAllSubtasks();
         testManager.getHistory();
     }
 

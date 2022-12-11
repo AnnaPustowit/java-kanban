@@ -87,20 +87,29 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllTasks() {
+        for (Map.Entry<Integer, Task> pair : tasksMap.entrySet()) {
+            historyManager.remove(pair.getKey());
+        }
         tasksMap.clear();
     }
 
     @Override
     public void deleteAllEpics() {
+        deleteAllSubtasks();
+        for (Map.Entry<Integer, Epic> pair : epicsMap.entrySet()) {
+            historyManager.remove(pair.getKey());
+        }
         epicsMap.clear();
-        subtasksMap.clear();
     }
 
     @Override
     public void deleteAllSubtasks() {
+        for (Map.Entry<Integer, Subtask> pair : subtasksMap.entrySet()) {
+            historyManager.remove(pair.getKey());
+        }
         subtasksMap.clear();
-        for (int i = 0; i < epicsMap.size(); i++) {
-            epicsMap.get(i).clearSubtasksList();
+        for (Map.Entry<Integer, Epic> pair : epicsMap.entrySet()) {
+            pair.getValue().clearSubtasksList();
         }
     }
 
@@ -138,6 +147,7 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             System.out.println("Задача под таким номером еще не создана.");
         }
+        historyManager.remove(number);
     }
 
     @Override
@@ -171,7 +181,6 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         historyManager.update(task);
-
     }
 
     @Override
