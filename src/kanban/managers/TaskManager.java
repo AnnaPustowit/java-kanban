@@ -2,7 +2,9 @@ package kanban.managers;
 
 import kanban.task.Task;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.TreeMap;
 
 public interface TaskManager {
 
@@ -29,4 +31,6 @@ public interface TaskManager {
     public int generateId();
 
     public List<Task> getHistory();
+
+    public TreeMap<LocalDateTime, Task> getPrioritizedTasks();
 }

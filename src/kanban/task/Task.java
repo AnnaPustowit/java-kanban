@@ -1,38 +1,36 @@
 package kanban.task;
 
+import java.util.Comparator;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Task {
     protected int taskId;
     protected Type type;
     protected String nameTask;
     protected String description;
     protected Status status;
+    protected LocalDateTime startTime;
+    protected int duration;
+
 
     public String toString() {
         return  (taskId +
                 "," + type +
                 "," + nameTask  +
                 "," + description +
-                "," + status) ;
+                "," + status +
+                "," + toFormatTime(startTime) +
+                "," + duration);
     }
 
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public void setNameTask(String nameTask) {
-        this.nameTask = nameTask;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
+    public static String toFormatTime(LocalDateTime time) {
+        if (time != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+            String formatDateTime = time.format(formatter);
+            return formatDateTime;
+        }
+        return null;
     }
 
     public enum Status {
@@ -47,12 +45,14 @@ public class Task {
         SUBTASK
     }
 
-    public Task(int taskId, Type type, String nameTask, String description, Status status) {
+    public Task(int taskId, Type type, String nameTask, String description, Status status, LocalDateTime startTime, int duration) {
         this.taskId = taskId;
         this.type = type;
         this.nameTask = nameTask;
         this.description = description;
         this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public Task() {
@@ -61,6 +61,8 @@ public class Task {
         this.nameTask = "";
         this.description = "";
         this.status = null;
+        this.startTime = null;
+        this.duration = 0;
     }
 
     public int getId() {
@@ -82,4 +84,12 @@ public class Task {
     public Status getStatus() {
         return status;
     }
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+    public int getDuration() {
+        return duration;
+    }
+
+
 }

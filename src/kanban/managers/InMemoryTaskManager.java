@@ -4,11 +4,9 @@ import kanban.task.Epic;
 import kanban.task.Subtask;
 import kanban.task.Task;
 
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     int idGenerator;
@@ -16,6 +14,9 @@ public class InMemoryTaskManager implements TaskManager {
     Map<Integer, Epic> epicsMap;
     Map<Integer, Subtask> subtasksMap;
     static HistoryManager historyManager;
+    Map<LocalDateTime, Task> taskTreeMap;
+    //Comparator<Task> comparator = new TaskStartTimeComparator().thenComparing(new TaskIdComparator());
+    //Set<Task> setTask;
 
     public InMemoryTaskManager() {
         idGenerator = 1;
@@ -23,24 +24,57 @@ public class InMemoryTaskManager implements TaskManager {
         epicsMap = new HashMap<>();
         subtasksMap = new HashMap<>();
         historyManager = Managers.getDefaultHistory();
+        taskTreeMap = new TreeMap<>();
+        //setTask = new TreeSet<>(comparator);
+    }
+
+    @Override
+    public TreeMap<LocalDateTime, Task> getPrioritizedTasks() {
+        return (TreeMap<LocalDateTime, Task>) taskTreeMap;
     }
 
     @Override
     public void createNewTask(Task task) {
+        if ( !(task instanceof  Epic) && (task.getStartTime() != null)) {//проверка на пересечения по времени
+            for (Map.Entry<LocalDateTime, Task> pair : taskTreeMap.entrySet()) {
+                if ( ((pair.getKey().isBefore(task.getStartTime()) || pair.getKey().isEqual(task.getStartTime())) &&
+                        (task.getStartTime().isBefore(pair.getKey().plusMinutes(pair.getValue().getDuration())) ||
+                                task.getStartTime().isEqual(pair.getKey().plusMinutes(pair.getValue().getDuration())))) ||
+
+                        ((task.getStartTime().isBefore(pair.getKey()) || task.getStartTime().isEqual(pair.getKey())) &&
+                                (task.getStartTime().plusMinutes(task.getDuration()).isAfter(pair.getKey()) ||
+                                        task.getStartTime().plusMinutes(task.getDuration()).isEqual(pair.getKey()))) ||
+
+                        ((pair.getKey().isBefore(task.getStartTime()) || pair.getKey().isEqual(task.getStartTime())) &&
+                                (task.getStartTime().plusMinutes(task.getDuration()).isBefore(pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration())) ||
+                                        task.getStartTime().plusMinutes(task.getDuration()).isEqual(pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration())))) ||
+
+                        ((task.getStartTime().isBefore(pair.getKey()) || task.getStartTime().isBefore(pair.getKey())) &&
+                                (pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration()).isBefore(task.getStartTime().plusMinutes(task.getDuration())) ||
+                                        pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration()).isEqual(task.getStartTime().plusMinutes(task.getDuration()))))) {
+                    System.out.println("ЭТО ВРЕМЯ - " + task.getStartTime() + " - УЖЕ ЗАНЯТО!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    return;
+                }
+
+            }
+            taskTreeMap.put(task.getStartTime(), task);
+        }
+        System.out.println("Id: " + task.getId());
+       // taskTreeMap.put(task.getStartTime(), task);
+
         if (task instanceof Epic) {
             epicsMap.put(task.getId(), (Epic) task);
         } else if (task instanceof Subtask) {
-            int tempEpicId = ((Subtask)task).getEpicId();
+            int tempEpicId = ((Subtask) task).getEpicId();
             int tempSubtaskId = task.getId();
             if (epicsMap.containsKey(tempEpicId)) {
-                subtasksMap.put(tempSubtaskId, (Subtask) task);
-                epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
-            } else {
-                System.out.println("Для этой подзадачи не существует эпика. Добавление не выполнено.");
+                 subtasksMap.put(tempSubtaskId, (Subtask) task);
+                 epicsMap.get(tempEpicId).addSubtasks(tempSubtaskId, subtasksMap);
             }
         } else if (task instanceof Task) {
-            tasksMap.put(task.getId(), task);
+               tasksMap.put(task.getId(), task);
         }
+
     }
 
     @Override
@@ -88,6 +122,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllTasks() {
         for (Map.Entry<Integer, Task> pair : tasksMap.entrySet()) {
+
+            taskTreeMap.remove(pair.getValue().getStartTime());//удалить все ключи-даты по таскам
+
             historyManager.remove(pair.getKey());
         }
         tasksMap.clear();
@@ -105,6 +142,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllSubtasks() {
         for (Map.Entry<Integer, Subtask> pair : subtasksMap.entrySet()) {
+
+            taskTreeMap.remove(pair.getValue().getStartTime());//удалить все ключи-даты по сабтаскам
+
             historyManager.remove(pair.getKey());
         }
         subtasksMap.clear();
@@ -124,7 +164,7 @@ public class InMemoryTaskManager implements TaskManager {
             tempTask = subtasksMap.get(number);
         } else {
             System.out.println("Задача под таким номером еще не создана.");
-            tempTask = new Task();
+            return new Task();
         }
         historyManager.add(tempTask);
         return tempTask;
@@ -133,14 +173,27 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(int number) {
         if (tasksMap.containsKey(number)) {
+
+            taskTreeMap.remove(tasksMap.get(number).getStartTime());//NEW
+
             tasksMap.remove(number);
+
         } else if (epicsMap.containsKey(number)) {
             HashSet<Integer> subtasksTempSet = epicsMap.get(number).getSetOfSubtasks();
+
             for (Integer subKey : subtasksTempSet) {
+                LocalDateTime tempTime = subtasksMap.get(subKey).getStartTime();
+                if (tempTime != null) {
+                    taskTreeMap.remove(tempTime);
+                }
                 subtasksMap.remove(subKey);
+
             }
             epicsMap.remove(number);
         } else if (subtasksMap.containsKey(number)) {
+
+            taskTreeMap.remove(subtasksMap.get(number).getStartTime());//NEW
+
             int tempEpicId = subtasksMap.get(number).getEpicId();
             subtasksMap.remove(number);
             epicsMap.get(tempEpicId).deleteSubtasks(number, subtasksMap);
@@ -152,6 +205,38 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTasks(Task task) {
+        if (!(task instanceof  Epic)) { //проверка на пересечения по времени
+            for (Map.Entry<LocalDateTime, Task> pair : taskTreeMap.entrySet()) {
+                if (((pair.getKey().isBefore(task.getStartTime()) || pair.getKey().isEqual(task.getStartTime())) &&
+                        (task.getStartTime().isBefore(pair.getKey().plusMinutes(pair.getValue().getDuration())) ||
+                                task.getStartTime().isEqual(pair.getKey().plusMinutes(pair.getValue().getDuration())))) ||
+
+                        ((task.getStartTime().isBefore(pair.getKey()) || task.getStartTime().isEqual(pair.getKey())) &&
+                                (task.getStartTime().plusMinutes(task.getDuration()).isAfter(pair.getKey()) ||
+                                        task.getStartTime().plusMinutes(task.getDuration()).isEqual(pair.getKey()))) ||
+
+                        ((pair.getKey().isBefore(task.getStartTime()) || pair.getKey().isEqual(task.getStartTime())) &&
+                                (task.getStartTime().plusMinutes(task.getDuration()).isBefore(pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration())) ||
+                                        task.getStartTime().plusMinutes(task.getDuration()).isEqual(pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration())))) ||
+
+                        ((task.getStartTime().isBefore(pair.getKey()) || task.getStartTime().isBefore(pair.getKey())) &&
+                                (pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration()).isBefore(task.getStartTime().plusMinutes(task.getDuration())) ||
+                                        pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration()).isEqual(task.getStartTime().plusMinutes(task.getDuration()))))) {
+                    System.out.println("Ошибка обновления - такое время уже занято");
+                    return;
+                }
+            }
+        }
+        LocalDateTime timeForRemove = null;
+        for (Map.Entry<LocalDateTime, Task> pair : taskTreeMap.entrySet()) {
+            if (pair.getValue().getId() == task.getId()) {//если у таска внутри дат есть ид такой,то удалить эту пару
+                //taskTreeMap.remove(pair.getKey());//NEW
+                timeForRemove = pair.getKey();
+            }
+        }
+        taskTreeMap.remove(timeForRemove);
+        taskTreeMap.put(task.getStartTime(), task);//вызвать метод добавления таска с новым временем
+
         if (task instanceof Epic) {
             int tempEpicId = task.getId();
             if (epicsMap.containsKey(tempEpicId)) {
@@ -192,4 +277,24 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory(){
         return (List<Task>) historyManager.getHistory();
     }
+    /* class TaskStartTimeComparator implements Comparator<Task>{
+
+        public int compare(Task a, Task b){
+
+            return a.getStartTime().compareTo(b.getStartTime());
+        }
+    }
+
+    class TaskIdComparator implements Comparator<Task>{
+
+        public int compare(Task a, Task b){
+
+            if(a.getId()> b.getId())
+                return 1;
+            else if(a.getId()< b.getId())
+                return -1;
+            else
+                return 0;
+        }
+    }*/
 }

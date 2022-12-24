@@ -1,10 +1,12 @@
 package kanban.task;
+import java.time.LocalDateTime;
+import java.time.Duration;
 
 public class Subtask extends Task {
     int epicId;
 
-    public Subtask(int taskId, Type type, String nameTask, String description, Task.Status status, int epicId) {
-        super(taskId, type, nameTask, description, status);
+    public Subtask(int taskId, Type type, String nameTask, String description, Task.Status status, LocalDateTime startTime, int duration, int epicId) {
+        super(taskId, type, nameTask, description, status,startTime, duration);
         this.epicId = epicId;
     }
 
@@ -15,6 +17,8 @@ public class Subtask extends Task {
                 "," + nameTask  +
                 "," + description +
                 "," + status +
+                "," + toFormatTime(startTime) +
+                "," + duration +
                 "," + epicId) ;
     }
 

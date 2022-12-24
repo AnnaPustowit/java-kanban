@@ -5,7 +5,8 @@ import kanban.task.Subtask;
 import kanban.task.Task;
 
 import java.io.*;
-
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +17,7 @@ import static kanban.task.Task.Status;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private final String  FILE_LINE = "id,type,name,status,description,epic";
+    private final String  FILE_LINE = "id,type,name,status,description,epic,startTime,duration";
     private static File tasksFile = new File("tasksFile.txt");
 
     public FileBackedTasksManager() {
@@ -90,18 +91,30 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String name = array[2];
         String description = array[3];
         Status status = Status.valueOf(array[4]);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        LocalDateTime localTime = null;
+        if(array[5] != null) {
+            localTime = LocalDateTime.parse(array[5], formatter);
+        } else {
+            localTime = null;
+        }
+
+       // LocalDateTime time = LocalDateTime.of(array[5]);
+
+        int tasksDuration = Integer.parseInt(array[6]);
         int epicId = 0;
         switch (types) {
             case "TASK":
                 type = Type.valueOf(types);
-                return new Task(id, type, name, description, status);
+                return new Task(id, type, name, description, status, localTime, tasksDuration);
             case "EPIC":
                 type = Type.valueOf(types);
-                return new Epic(id, type, name, description, status);
+                return new Epic(id, type, name, description, status,localTime, tasksDuration);
             case "SUBTASK":
                 type = Type.valueOf(types);
-                epicId = Integer.parseInt(array[5]);
-                return new Subtask(id, type, name, description, status, epicId);
+                epicId = Integer.parseInt(array[7]);
+                return new Subtask(id, type, name, description, status,localTime, tasksDuration, epicId);
             default:
                 return null;
         }
@@ -149,7 +162,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     @Override
     public void createNewTask(Task task) {
         super.createNewTask(task);
-        save();
+        //save();
     }
 
     @Override
@@ -169,6 +182,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         super.deleteAllSubtasks();
         save();
     }
+
+    @Override
+    public Task getTaskById(int number) {
+        Task taskForReturn = super.getTaskById(number);
+        save();
+        return taskForReturn;
+
+    }
+
 
     @Override
     public void deleteTaskById(int number) {
