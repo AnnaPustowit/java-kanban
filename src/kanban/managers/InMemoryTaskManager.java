@@ -49,7 +49,7 @@ public class InMemoryTaskManager implements TaskManager {
                         ((task.getStartTime().isBefore(pair.getKey()) || task.getStartTime().isBefore(pair.getKey())) &&
                                 (pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration()).isBefore(task.getStartTime().plusMinutes(task.getDuration())) ||
                                         pair.getValue().getStartTime().plusMinutes(pair.getValue().getDuration()).isEqual(task.getStartTime().plusMinutes(task.getDuration()))))) {
-                    System.out.println("ЭТО ВРЕМЯ - " + task.getStartTime() + " - УЖЕ ЗАНЯТО!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    System.out.println("Ошибка - такое время уже занято");
                     return;
                 }
 
