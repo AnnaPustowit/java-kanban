@@ -100,8 +100,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             localTime = null;
         }
 
-       // LocalDateTime time = LocalDateTime.of(array[5]);
-
         int tasksDuration = Integer.parseInt(array[6]);
         int epicId = 0;
         switch (types) {

@@ -22,7 +22,6 @@ class EpicTest {
     public void beforeEachTest() {
         epicTest = new HashMap<>();
         subtaskTest = new HashMap<>();
-        subtasksIdTest = new HashSet<>();
 
         LocalDateTime localDateTime1 = LocalDateTime.of(2022,12, 23,10, 0);
         LocalDateTime localDateTime2 = LocalDateTime.of(2022,12, 23,13, 0);

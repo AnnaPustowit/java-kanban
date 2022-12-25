@@ -15,8 +15,6 @@ public class InMemoryTaskManager implements TaskManager {
     Map<Integer, Subtask> subtasksMap;
     static HistoryManager historyManager;
     Map<LocalDateTime, Task> taskTreeMap;
-    //Comparator<Task> comparator = new TaskStartTimeComparator().thenComparing(new TaskIdComparator());
-    //Set<Task> setTask;
 
     public InMemoryTaskManager() {
         idGenerator = 1;
@@ -25,7 +23,6 @@ public class InMemoryTaskManager implements TaskManager {
         subtasksMap = new HashMap<>();
         historyManager = Managers.getDefaultHistory();
         taskTreeMap = new TreeMap<>();
-        //setTask = new TreeSet<>(comparator);
     }
 
     @Override
@@ -60,7 +57,6 @@ public class InMemoryTaskManager implements TaskManager {
             taskTreeMap.put(task.getStartTime(), task);
         }
         System.out.println("Id: " + task.getId());
-       // taskTreeMap.put(task.getStartTime(), task);
 
         if (task instanceof Epic) {
             epicsMap.put(task.getId(), (Epic) task);
@@ -230,7 +226,6 @@ public class InMemoryTaskManager implements TaskManager {
         LocalDateTime timeForRemove = null;
         for (Map.Entry<LocalDateTime, Task> pair : taskTreeMap.entrySet()) {
             if (pair.getValue().getId() == task.getId()) {//если у таска внутри дат есть ид такой,то удалить эту пару
-                //taskTreeMap.remove(pair.getKey());//NEW
                 timeForRemove = pair.getKey();
             }
         }
@@ -240,7 +235,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (task instanceof Epic) {
             int tempEpicId = task.getId();
             if (epicsMap.containsKey(tempEpicId)) {
-                // удаляем все subtasks у старого epic
                 HashSet<Integer> subtasksTempSet = epicsMap.get(tempEpicId).getSetOfSubtasks();
                 for (Integer key : subtasksTempSet) {
                     subtasksMap.remove(key);
@@ -277,24 +271,5 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory(){
         return (List<Task>) historyManager.getHistory();
     }
-    /* class TaskStartTimeComparator implements Comparator<Task>{
-
-        public int compare(Task a, Task b){
-
-            return a.getStartTime().compareTo(b.getStartTime());
-        }
-    }
-
-    class TaskIdComparator implements Comparator<Task>{
-
-        public int compare(Task a, Task b){
-
-            if(a.getId()> b.getId())
-                return 1;
-            else if(a.getId()< b.getId())
-                return -1;
-            else
-                return 0;
-        }
-    }*/
 }
+

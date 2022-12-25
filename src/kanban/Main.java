@@ -15,13 +15,9 @@ public class Main {
 public static void main(String[] args) {
 
     TaskManager testManager = Managers.getDefault();
-    //FileBackedTasksManager fileManager = new FileBackedTasksManager();
 
     Scanner scanner = new Scanner(System.in);
 
-    if (testManager instanceof FileBackedTasksManager); {
-        System.out.println("ZALUPA");
-    }
     while(true) {
         printMenu();
         int userInput = scanner.nextInt();

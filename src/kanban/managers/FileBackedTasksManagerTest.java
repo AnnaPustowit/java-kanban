@@ -78,32 +78,4 @@ class FileBackedTasksManagerTest extends TaskManagerTest {
        assertEquals(testSubtaskFromFileString,subtaskString,"Вернуть сабтаск из файла не удалось.");
 
     }
-
-    @Test
-    void createNewTask() {
-    }
-
-    @Test
-    void deleteAllTasks() {
-    }
-
-    @Test
-    void deleteAllEpics() {
-    }
-
-    @Test
-    void deleteAllSubtasks() {
-    }
-
-    @Test
-    void getTaskById() {
-    }
-
-    @Test
-    void deleteTaskById() {
-    }
-
-    @Test
-    void updateTasks() {
-    }
 }
