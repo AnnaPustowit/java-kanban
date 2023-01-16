@@ -24,7 +24,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         super();
     }
 
-    private void save() throws ManagerSaveException {
+    protected void save() throws ManagerSaveException {
         clearFile();
         try (FileWriter fw = new FileWriter(tasksFile, true)) {
             ArrayList<Task> taskArray = (ArrayList<Task>) historyManager.getHistory();

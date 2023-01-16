@@ -1,22 +1,34 @@
 package kanban;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Scanner;
 
-import kanban.managers.FileBackedTasksManager;
-import kanban.managers.Managers;
-import kanban.managers.TaskManager;
+import com.google.gson.Gson;
+import kanban.managers.*;
 import kanban.task.Epic;
 import kanban.task.Subtask;
 import kanban.task.Task;
 
 public class Main {
-public static void main(String[] args) {
+public static void main(String[] args) throws IOException, InterruptedException {
+    final Gson gson = new Gson();
 
-    TaskManager testManager = Managers.getDefault();
+    new KVServer().start();
+    HttpTaskManager m = new HttpTaskManager(URI.create("http://localhost:8080/register"));
 
-    Scanner scanner = new Scanner(System.in);
+    Task newTask = new Task(1, Task.Type.TASK, "Съесть пирожок", "Пирожой с вишней",
+            Task.Status.NEW, LocalDateTime.of(2022, 12, 1, 10, 0), 30);
+    String json = gson.toJson(newTask);
+
+    m.taskClient.put("tasks", json);
+    m.taskClient.load("tasks");
+   /* Scanner scanner = new Scanner(System.in);
 
     while(true) {
         printMenu();
@@ -86,7 +98,7 @@ public static void main(String[] args) {
                 System.out.println("KEY : " + pair.getKey() + "  -  VALUE : " + pair.getValue());
             }
         } else if (userInput == 9) {    // тестирование
-            kanban.TestClass test = new kanban.TestClass();
+            TestClass test = new TestClass();
             test.runTest();
         } else if (userInput == 8) {
             testManager.getHistory();
@@ -97,7 +109,7 @@ public static void main(String[] args) {
             System.out.println("Такой команды нет!");
         }
         System.out.println();
-    }
+    }*/
 }
 
 private static void printMenu() {

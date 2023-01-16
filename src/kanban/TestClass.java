@@ -12,7 +12,7 @@ import kanban.task.Task;
 
 public class TestClass {
 
-    TaskManager testManager = Managers.getDefault();
+    /*TaskManager testManager = Managers.getDefault();
 
     public void runTest(){
         addTestObjects();
@@ -106,5 +106,5 @@ public class TestClass {
         testManager.updateTasks(subtask4);
     }
 
-
+*/
 }
