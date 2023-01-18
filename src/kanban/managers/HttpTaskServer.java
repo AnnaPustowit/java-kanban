@@ -21,7 +21,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class HttpTaskServer  {
     private static final int PORT = 8081;
     private static final Gson gson = new Gson();
-    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
      TaskManager taskManager;
      HttpServer server;
 
@@ -36,25 +35,23 @@ public class HttpTaskServer  {
     public void start() throws IOException  {
         System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
         server = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);
-        server.createContext("/tasks/", new TasksHandler());            // вернуть список задач по приоритету
-        server.createContext("/tasks/task/", new TasksHandler());       //вернуть лист тасков
-        server.createContext("/tasks/epic/", new TasksHandler());       //вернуть лист эпиков
-        server.createContext("/tasks/subtask/", new TasksHandler());    //вернуть лист сабтасков
-        server.createContext("/tasks/history/", new TasksHandler());    //
-        server.createContext("/tasks/task/?id=", new TasksHandler());
+        server.createContext("/tasks/", new TasksHandler());                // вернуть список задач по приоритету
+        server.createContext("/tasks/task/", new TasksHandler());           //вернуть/удалить лист тасков
+        server.createContext("/tasks/epic/", new TasksHandler());           //вернуть/удалить  лист эпиков
+        server.createContext("/tasks/subtask/", new TasksHandler());        //вернуть/удалить  лист сабтасков
+        server.createContext("/tasks/history/", new TasksHandler());        //вернуть историю
+        server.createContext("/tasks/task/?id=", new TasksHandler());       //вернуть/удалить по id
+        server.createContext("/tasks/task/update/", new TasksHandler());    //обновление тасков
+        server.createContext("/tasks/epic/update/", new TasksHandler());    //обновление эпиков
+        server.createContext("/tasks/subtask/update/", new TasksHandler()); //обновление сабтасков
         server.start();
     }
 
-    public void stop() throws IOException  {
+    public void stop() {
         server.stop(5);
         System.out.println("HTTP-сервер остановлен!");
     }
 
-    //public static void main(String[] args) throws IOException {
-       // HttpTaskServer sv = new HttpTaskServer();
-       // sv.start();
-       // sv.stop();
-    //}
     class TasksHandler implements HttpHandler {
 
         @Override
@@ -66,17 +63,14 @@ public class HttpTaskServer  {
 
                 switch (endpoint) {
                     case POST: {
-                        if (Pattern.matches("^/tasks/task/task:/\\w*+$", path)) {
-                            String s = path.replaceFirst("/tasks/task/task:/", "");//
-                            Task task = gson.fromJson(s, Task.class);
+                        if (Pattern.matches("^/tasks/task/\\w*+$", path)) {
+                            Task task = gson.fromJson(read(exchange), Task.class);
                             taskManager.createNewTask(task);
-                        } else if (Pattern.matches("^/tasks/epic/epic:/\\w*+$", path)) {
-                            String s = path.replaceFirst("/tasks/epic/epic:/", "");//
-                            Epic epic = gson.fromJson(s, Epic.class);
+                        } else if (Pattern.matches("^/tasks/epic/\\w*+$", path)) {
+                            Epic epic = gson.fromJson(read(exchange), Epic.class);
                             taskManager.createNewTask(epic);
-                        } else if (Pattern.matches("^/tasks/subtask/subtask:/\\w*+$", path)) {
-                            String s = path.replaceFirst("/tasks/subtask/subtask:/", "");//
-                            Subtask subtask =  gson.fromJson(s, Subtask.class);
+                        } else if (Pattern.matches("^/tasks/subtask/\\w*+$", path)) {
+                            Subtask subtask =  gson.fromJson(read(exchange), Subtask.class);
                             taskManager.createNewTask(subtask);
                         }
                         exchange.sendResponseHeaders(200, 0);//
@@ -131,17 +125,14 @@ public class HttpTaskServer  {
                         }
                     }
                     case POST_ID: {
-                        if (Pattern.matches("^/tasks/task/task:/\\w*+$", path)) {
-                            String s = path.replaceFirst("/tasks/task/task:/", "");//
-                            Task task = gson.fromJson(s, Task.class);
+                        if (Pattern.matches("^/tasks/task/update/\\w*+$", path)) {
+                            Task task = gson.fromJson(read(exchange), Task.class);
                             taskManager.updateTasks(task);
-                        } else if (Pattern.matches("^/tasks/epic/epic:/\\w*+$", path)) {
-                            String s = path.replaceFirst("/tasks/epic/epic:/", "");//
-                            Epic epic = (Epic) gson.fromJson(s, Task.class);
+                        } else if (Pattern.matches("^/tasks/epic/update/\\w*+$", path)) {
+                            Epic epic = (Epic) gson.fromJson(read(exchange), Task.class);
                             taskManager.updateTasks(epic);
-                        } else if (Pattern.matches("^/tasks/subtask/subtask:/\\w*+$", path)) {
-                            String s = path.replaceFirst("/tasks/subtask/subtask:/", "");//
-                            Subtask subtask = (Subtask) gson.fromJson(s, Task.class);
+                        } else if (Pattern.matches("^/tasks/subtask/update/\\w*+$", path)) {
+                            Subtask subtask = (Subtask) gson.fromJson(read(exchange), Task.class);
                             taskManager.updateTasks(subtask);
                         }
                         exchange.sendResponseHeaders(200, 0);//
@@ -169,6 +160,10 @@ public class HttpTaskServer  {
             }
         }
 
+        public String read(HttpExchange exchange) throws IOException {
+            return new String(exchange.getRequestBody().readAllBytes(), UTF_8);
+        }
+
         private int parsePathInt(String path) {
             String[] pathId = path.split("/");
             int id;
@@ -192,8 +187,8 @@ public class HttpTaskServer  {
                 if (Pattern.matches("^/tasks/task/\\w*+$", path) || Pattern.matches("^/tasks/epic/\\w*+$", path)
                         || Pattern.matches("^/tasks/subtask/\\w*+$", path)) {
                     return Endpoint.POST;
-                } else if (Pattern.matches("^/tasks/task/\\d+$", path) || Pattern.matches("^/tasks/epic/\\d+$", path)
-                        || Pattern.matches("^/tasks/subtask/\\d+$", path)) {
+                } else if (Pattern.matches("^/tasks/task/update/\\w*+$", path) || Pattern.matches("^/tasks/epic/update/\\w*+$", path)
+                        || Pattern.matches("^/tasks/subtask/update/\\w*+$", path)) {
                     return Endpoint.POST_ID;
                 }
             } else if (method.equals("GET")) {    // GET

@@ -20,17 +20,14 @@ public static void main(String[] args) throws IOException, InterruptedException 
     final Gson gson = new Gson();
 
     new KVServer().start();
-    HttpTaskManager m = new HttpTaskManager(URI.create("http://localhost:8080/register"));
+    HttpTaskManager m = new HttpTaskManager(URI.create("http://localhost:8080"));
 
     Task newTask = new Task(1, Task.Type.TASK, "Съесть пирожок", "Пирожой с вишней",
             Task.Status.NEW, LocalDateTime.of(2022, 12, 1, 10, 0), 30);
     String json = gson.toJson(newTask);
 
-    m.taskClient.put("tasks", json);
-    m.taskClient.load("tasks");
-   /* Scanner scanner = new Scanner(System.in);
 
-    while(true) {
+ /*   while(true) {
         printMenu();
         int userInput = scanner.nextInt();
         if(userInput == 1){             // добавление задачи

@@ -29,6 +29,7 @@ class HttpTaskServerTest {
     GsonBuilder builder;
     Gson gson ;
     private HttpTaskServer server;
+    private KVServer kvServer;
     private TaskManager tm;
     private Task taskTest;
     private Epic epicTest;
@@ -38,7 +39,9 @@ class HttpTaskServerTest {
 
     @BeforeEach
     void init() throws IOException, InterruptedException {
-        tm = Managers.getDefault();
+        kvServer = new KVServer();
+        kvServer.start();
+        tm = Managers.getDefaultHtpManager();//тут новый серверный менеджер
         builder = new GsonBuilder();
         builder.serializeNulls();
         gson = builder.create();
@@ -56,10 +59,11 @@ class HttpTaskServerTest {
     @AfterEach
     public void stop() throws IOException {
         server.stop();
+        kvServer.stop();
     }
 
     @Test
-    void postTasksTest() throws IOException, InterruptedException { //ведутся работы
+    void postTasks() throws IOException, InterruptedException { //ведутся работы
         HttpClient client = HttpClient.newHttpClient();
         URI uri = (URI.create("http://localhost:8081/tasks/task/"));
         Task newTask = new Task(4, Task.Type.TASK, "Задача 4.", "Описание задачи 4.", Task.Status.NEW, LocalDateTime.of(2022,12, 23,14, 0),30);
@@ -71,13 +75,14 @@ class HttpTaskServerTest {
 
         System.out.println(json);
 
-
-
+        Task t = tm.getTaskById(4);
+        String s1 = newTask.toString();
+        String s2 = t.toString();
+        assertEquals(s1,s2);
     }
 
-
     @Test
-    void getAllTasksTest() throws IOException, InterruptedException {
+    void getAllTasks() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI uri = (URI.create("http://localhost:8081/tasks/task/"));
         HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
@@ -95,7 +100,7 @@ class HttpTaskServerTest {
     }
 
     @Test
-    void getAllEpicsTest() throws IOException, InterruptedException {
+    void getAllEpics() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI uri = (URI.create("http://localhost:8081/tasks/epic/"));
         HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
@@ -113,7 +118,7 @@ class HttpTaskServerTest {
     }
 
     @Test
-    void getAllSubtasksTest() throws IOException, InterruptedException {
+    void getAllSubtasks() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI uri = (URI.create("http://localhost:8081/tasks/subtask/"));
         HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
@@ -131,7 +136,7 @@ class HttpTaskServerTest {
     }
 
     @Test
-    void deleteAllTasksTest() throws IOException, InterruptedException {
+    void deleteAllTasks() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI uri = (URI.create("http://localhost:8081/tasks/task/"));
         HttpRequest request = HttpRequest.newBuilder().uri(uri).DELETE().build();
@@ -145,7 +150,7 @@ class HttpTaskServerTest {
     }
 
     @Test
-    void deleteAllEpicsTest() throws IOException, InterruptedException {
+    void deleteAllEpics() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI uri = (URI.create("http://localhost:8081/tasks/epic/"));
         HttpRequest request = HttpRequest.newBuilder().uri(uri).DELETE().build();
@@ -159,7 +164,7 @@ class HttpTaskServerTest {
     }
 
     @Test
-    void deleteAllSubtasksTest() throws IOException, InterruptedException {
+    void deleteAllSubtasks() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI uri = (URI.create("http://localhost:8081/tasks/subtask/"));
         HttpRequest request = HttpRequest.newBuilder().uri(uri).DELETE().build();
@@ -173,7 +178,7 @@ class HttpTaskServerTest {
     }
 
     @Test
-    void getTaskIdTest() throws IOException, InterruptedException {
+    void getTaskId() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI uri = (URI.create("http://localhost:8081/tasks/task/?id=1"));
         HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
@@ -194,10 +199,8 @@ class HttpTaskServerTest {
         assertEquals(s1,s2);
     }
 
-
-
     @Test
-    void deleteTaskIdTest() throws IOException, InterruptedException {
+    void deleteTaskId() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI uri = (URI.create("http://localhost:8081/tasks/task/?id=1"));
         HttpRequest request = HttpRequest.newBuilder().uri(uri).DELETE().build();
@@ -207,6 +210,52 @@ class HttpTaskServerTest {
         Type taskType = new TypeToken<List<Task>>(){}.getType();
         List<Task> actual = gson.fromJson(response.body(), taskType);
         assertEquals(null, actual);
+    }
+
+    @Test
+    void postTaskId() throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        URI uri = (URI.create("http://localhost:8081/tasks/task/update/"));
+        Task updateTask = new Task(1, Task.Type.TASK, "Теперь это другая задача 1.", "Теперь это новое описание задачи 1.", Task.Status.NEW, LocalDateTime.of(2022,12, 23,20, 0),30);
+        String json = gson.toJson(updateTask);
+        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(body).build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
+
+        Task t = tm.getTaskById(1);
+        String s1 = updateTask.toString();
+        System.out.println(s1);
+        String s2 = t.toString();
+        System.out.println(s2);
+        assertEquals(s1,s2);
+    }
+
+    @Test
+    void getHistory() throws IOException, InterruptedException {
+        tm.getTaskById(1);
+        tm.getTaskById(2);
+        tm.getTaskById(3);
+        HttpClient client = HttpClient.newHttpClient();
+        URI uri = (URI.create("http://localhost:8081/tasks/history/"));
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
+
+        List<Task> tasksSrc = new ArrayList<>();
+        tasksSrc.add(taskTest);
+        tasksSrc.add(epicTest);
+        tasksSrc.add(subtaskTest);
+        String json = gson.toJson(tasksSrc);
+
+        JsonElement jsonElement = JsonParser.parseString(response.body());
+        JsonArray jsonArray = jsonElement.getAsJsonArray();
+
+        assertNotNull(jsonArray);
+        String s1 = json;
+        String s2 = jsonArray.toString();
+
+        assertEquals(s1,s2);
     }
 
     @Test
