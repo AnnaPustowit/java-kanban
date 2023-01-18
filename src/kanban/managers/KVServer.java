@@ -12,9 +12,6 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-/**
- * Постман: https://www.getpostman.com/collections/a83b61d9e1c81c10575c
- */
 public class KVServer {
 	public static final int PORT = 8078;
 	private final String apiToken;
@@ -29,50 +26,6 @@ public class KVServer {
 		server.createContext("/load", this::load);
 	}
 
-	/*public static void main(String[] args) throws IOException { // проверка
-		KVServer kv = new KVServer();
-		kv.start();
-		kv.stop();
-	}*/
-
-	/*private void load(HttpExchange h) {
-		 //TODO Добавьте получение значения по ключу
-		try {
-			System.out.println("\n/load");
-			if(!hasAuth(h)) {
-				System.out.println("Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
-				h.sendResponseHeaders(403, 0);
-				return;
-			}
-			if ("GET".equals(h.getRequestMethod())) {
-				String key = h.getRequestURI().getPath().substring("/load/".length());
-				if (key.isEmpty()) {
-					System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");//ок
-					h.sendResponseHeaders(400, 0);
-					return;
-				}
-
-				String value = data.get(key);// readText(h);
-				if (value.isEmpty()) {
-					System.out.println("Value для сохранения пустой. value указывается в теле запроса");
-					h.sendResponseHeaders(400, 0);
-					return;
-				}
-				//String s = data.get(key);
-
-				//System.out.println("Значение по ключу: " + key + " = " + value);
-				//h.sendResponseHeaders(200, 0);
-
-			} else {
-				System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());
-				h.sendResponseHeaders(405, 0);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} finally {
-			h.close();
-		}
-	}*/
 	private void load(HttpExchange h) throws IOException {
 		try {
 			System.out.println("\n/load");
@@ -89,7 +42,6 @@ public class KVServer {
 					return;
 				}
 				String value = data.get(key);
-				//sendText(h, value);
 				if (value == null) {
 					System.out.println("Value для выгрузки пустой, value указывается в теле запроса!");
 					h.sendResponseHeaders(400, 0);

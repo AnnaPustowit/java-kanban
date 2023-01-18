@@ -18,7 +18,6 @@ public class KVTaskClient {
         HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(this.url+"/register")).build();
         HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
         apiToken = response.body();
-        System.out.println("Вот АПИ-токен -  " + apiToken);
     }
 
     public void put(String key, String json) throws IOException, InterruptedException {
@@ -45,5 +44,4 @@ public class KVTaskClient {
         }
         return managerStatus;
     }
-
 }

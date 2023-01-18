@@ -7,22 +7,15 @@ import com.sun.net.httpserver.HttpHandler;
 import kanban.task.Epic;
 import kanban.task.Subtask;
 import kanban.task.Task;
-
 import java.io.*;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-
 import java.util.regex.Pattern;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 
 public class HttpTaskServer  {
     private static final int PORT = 8081;
     private static final Gson gson = new Gson();
-     TaskManager taskManager;
-     HttpServer server;
+    TaskManager taskManager;
+    HttpServer server;
 
     public HttpTaskServer() throws IOException, InterruptedException {
         this(new FileBackedTasksManager());
@@ -55,7 +48,7 @@ public class HttpTaskServer  {
     class TasksHandler implements HttpHandler {
 
         @Override
-        public void handle(HttpExchange exchange) throws IOException {
+        public void handle(HttpExchange exchange) {
             try {
                 String path = exchange.getRequestURI().getPath();
                 String method = exchange.getRequestMethod();
@@ -235,6 +228,4 @@ public class HttpTaskServer  {
             GET_PRIORITIZED,
             UNKNOWN
         }
-
 }
-

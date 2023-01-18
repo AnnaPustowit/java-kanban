@@ -5,7 +5,6 @@ import com.google.gson.reflect.TypeToken;
 import kanban.task.Epic;
 import kanban.task.Subtask;
 import kanban.task.Task;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -21,7 +20,6 @@ public class HttpTaskManager extends FileBackedTasksManager {
             this.taskClient = new KVTaskClient(url);
             loadFromServer();
         }
-
 
         public void loadFromServer() throws IOException, InterruptedException {
             // создать менеджер из сервера
@@ -66,4 +64,3 @@ public class HttpTaskManager extends FileBackedTasksManager {
             }
         }
 }
-

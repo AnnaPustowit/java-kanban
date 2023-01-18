@@ -8,7 +8,6 @@ import kanban.task.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -57,7 +55,7 @@ class HttpTaskServerTest {
         server.start();
     }
     @AfterEach
-    public void stop() throws IOException {
+    public void stop() {
         server.stop();
         kvServer.stop();
     }

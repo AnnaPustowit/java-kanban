@@ -3,8 +3,6 @@ package kanban.managers;
 import kanban.task.Epic;
 import kanban.task.Subtask;
 import kanban.task.Task;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -272,4 +270,3 @@ public class InMemoryTaskManager implements TaskManager {
         return (List<Task>) historyManager.getHistory();
     }
 }
-

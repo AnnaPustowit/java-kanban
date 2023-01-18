@@ -34,13 +34,10 @@ class HttpTaskManagerTest extends TaskManagerTest {
        builder.serializeNulls();
        gson = builder.create();
        taskManager = Managers.getDefaultHtpManager();
-       // taskManager = new HttpTaskManager(URI.create("http://localhost:8078"));
     }
 
     @AfterEach
-    public void stop() throws IOException {
+    public void stop() {
         server.stop();
     }
-
-
 }
